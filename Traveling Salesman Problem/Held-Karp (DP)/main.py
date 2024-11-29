@@ -1,6 +1,8 @@
+from itertools import *
+
 def held_karp(dist):
     """
-    Solves the Traveling Salesman Problem using the Held-Karp dynamic programming algorithm.
+    Solves the Traveling Salesman Problem using the Held-Karp dynamic programming algorithm without bitwise operators.
 
     Parameters:
         dist: 2D list of distances between cities. dist[i][j] gives the distance from city i to city j.
@@ -13,44 +15,52 @@ def held_karp(dist):
     n = len(dist)
 
     # Create a DP table where dp[mask][i] is the minimum cost to visit all cities in 'mask', ending at city i
-    dp = [[float('inf')] * n for _ in range(1 << n)]
-    parent = [[-1] * n for _ in range(1 << n)]  # To reconstruct the path
+    # Instead of using bitmask, we will use a list of subsets
+    dp = {}
+    parent = {}
 
-    # Base case: cost of starting at city 0
-    dp[1][0] = 0  # Mask 1 means only city 0 is visited (binary: 0001)
+    # Base case: cost of starting at city 0 (only city 0 is visited)
+    dp[(frozenset([0]), 0)] = 0
 
-    # Iterate over all subsets of cities (represented as bitmasks)
-    for mask in range(1 << n):
-        for i in range(n):
-            if not (mask & (1 << i)):  # Skip if city i is not in the subset
-                continue
-            for j in range(n):
-                if mask & (1 << j) or j == i:  # Skip if city j is already visited or j == i
+    # Iterate over all possible subsets of cities (except the empty set and single city set)
+    for size in range(2, n + 1):  # size represents the number of cities in the subset
+        for subset in combinations(range(n), size):  # Generate subsets of a given size
+            subset_frozen = frozenset(subset)  # Use a frozen set for immutability
+            for i in subset:
+                if i == 0:
                     continue
-                new_mask = mask | (1 << j)  # Add city j to the subset
-                new_cost = dp[mask][i] + dist[i][j]
-                if new_cost < dp[new_mask][j]:
-                    dp[new_mask][j] = new_cost
-                    parent[new_mask][j] = i
+                # Find the minimum cost to reach city i from any other city in the subset
+                min_cost = float('inf')
+                prev_city = -1
+                for j in subset:
+                    if j == i:
+                        continue
+                    prev_subset = subset_frozen - frozenset([i])
+                    cost = dp.get((prev_subset, j), float('inf')) + dist[j][i]
+                    if cost < min_cost:
+                        min_cost = cost
+                        prev_city = j
+                dp[(subset_frozen, i)] = min_cost
+                parent[(subset_frozen, i)] = prev_city
 
     # Reconstruct the minimum cost to complete the tour
-    full_mask = (1 << n) - 1  # All cities visited (binary: 111...1)
+    full_subset = frozenset(range(n))  # All cities visited
     min_cost = float('inf')
     last_city = -1
     for i in range(1, n):  # Start from cities other than 0
-        cost = dp[full_mask][i] + dist[i][0]  # Return to starting city
+        cost = dp.get((full_subset, i), float('inf')) + dist[i][0]  # Return to starting city
         if cost < min_cost:
             min_cost = cost
             last_city = i
 
     # Reconstruct the path
     path = []
-    mask = full_mask
+    subset = full_subset
     while last_city != -1:
         path.append(last_city)
-        next_city = parent[mask][last_city]
-        mask &= ~(1 << last_city)  # Remove last_city from the subset
-        last_city = next_city
+        prev_city = parent[(subset, last_city)]
+        subset = subset - frozenset([last_city])  # Remove last_city from the subset
+        last_city = prev_city
 
     path.append(0)  # Add the starting city to complete the cycle
     path.reverse()
@@ -62,11 +72,10 @@ def held_karp(dist):
 if __name__ == "__main__":
     # Distance matrix
     dist_matrix = [
-        [0,  8,  13, 18, 20],
-        [3,  0,  7,  8,  10],
-        [4,  11, 0,  10, 7 ],
-        [6,  6,  7,  0,  1 ],
-        [10, 6,  2,  0,  1 ]
+        [0, 10, 15, 20],
+        [10, 0, 35, 25],
+        [15, 35, 0, 30],
+        [20, 25, 30, 0]
     ]
 
     cost, path = held_karp(dist_matrix)
