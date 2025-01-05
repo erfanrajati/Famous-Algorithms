@@ -3,7 +3,7 @@
 
 using namespace std;
 
-const int maxn = 1e6;
+const int maxn = 1e6;  
 vector <int> adj[maxn];
 bool mark[maxn];
 vector <int> vers;
