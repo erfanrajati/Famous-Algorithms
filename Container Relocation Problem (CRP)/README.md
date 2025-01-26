@@ -56,7 +56,7 @@ Steps followed in the code:
   3. Backtrack if a move results in an invalid state or no solution.
 - Record valid moves and return the path leading to a solution.
 
----
+
 
 ### Phase 2
 
@@ -77,6 +77,26 @@ Steps followed in the code:
   2. Attempt placing it in other containers, ensuring capacity constraints are met and only one type of ice cream is allowed per container.
   3. Backtrack if a move violates constraints or leads to a dead end.
 - Record and output the sequence of valid moves leading to a solution.
+
+---
+
+## **Complexity Analysis**
+
+1. **Phase 1 Time Complexity**:
+   - The worst-case complexity is indeed \(O(b^d)\), but the branching factor \(b\) should be explicitly explained as \(n \cdot (n-1)\), where \(n\) is the number of containers. This represents all possible moves between containers.
+   - The depth \(d\) depends on the number of ice cream scoops, \(m\), since at most \(m\) moves are required to relocate all scoops.
+
+2. **Phase 2 Complexity Analysis**:
+   - You state \(O(n \cdot (n-1) \cdot c)\) for the branching factor, which should be clarified. The additional \(c\) arises from the volume calculations, but you can specify that it’s related to checking whether the current volume fits within the capacity of the target container.
+
+3. **General Suggestion**:
+   - Highlight how memoization (via the visited states set) mitigates the exponential growth by pruning previously explored states.
+
+#### **Mathematical Precision**
+
+The explanation for backtracking efficiency can be enhanced:
+- Mention how state representation (tuples of containers) helps avoid redundant exploration.
+- Add that the memory usage grows due to storing all visited states but remains manageable for small \(n\) and \(m\).
 
 ---
 
