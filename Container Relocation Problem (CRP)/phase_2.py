@@ -77,7 +77,7 @@ for i in range(n):
     container = [(c,ice_creams[c]) for c in temp]
     if temp:
         h = max(map(lambda item:item[1], container))
-        containers[i][0] = len(container) + h # Set the capacity of each container
+        containers[i][0] = sum(map(lambda item:item[1], container)) + h # Set the capacity of each container
         containers[i][1] = container
 
 

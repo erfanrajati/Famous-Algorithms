@@ -28,7 +28,7 @@ def backtrack(containers, visited, path, max_capacity):
             if i == j:
                 continue
             # Check if we can place the ice cream in the target container
-            if (not containers[j] or containers[j][-1] == ice_cream) and len(containers[j]) < max_capacity:
+            if not containers[j] or (containers[j][-1] == ice_cream and len(containers[j]) < max_capacity):
                 containers[j].append(ice_cream)
                 path.append((i, j))  # Record the move
                 result = backtrack(containers, visited, path, max_capacity)
@@ -54,7 +54,7 @@ for i in range(n):
 # Backtracking to solve the problem
 visited = set()
 path = []  # To record the moves
-solution = backtrack(containers, visited, path)
+solution = backtrack(containers, visited, path, m)
 
 
 # Output the solution
